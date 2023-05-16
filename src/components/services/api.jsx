@@ -16,5 +16,5 @@ const instance = axios.create( {
 
 export async function getImagesList( { queryString, page = 1, per_page = 12 } ) {
     const { data } = await instance.get( '', { params: { q: queryString, page, per_page } } );
-    return data.hits;
+    return data;
 }

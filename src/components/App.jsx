@@ -12,12 +12,21 @@ export class App extends Component {
         imagesList: [],
         page: 1,
         perPage: 12,
-        isLoading: false
+        isLoading: false,
+        showBtn: false
     }
 
     getInputValue = ( value ) => {
+        if ( value === this.state.value || !value ) {
+            return;
+        }
         this.setState( {
-            value
+            value,
+            imagesList: [],
+            page: 1,
+            perPage: 12,
+            isLoading: false,
+            showBtn: false
         } )
     }
 
@@ -37,7 +46,8 @@ export class App extends Component {
         getImagesList( { queryString, page, per_page } ).then( ( data ) => {
             this.setState( prevState => {
                 return {
-                    imagesList: [...prevState.imagesList, ...data]
+                    imagesList: [...prevState.imagesList, ...data.hits],
+                    showBtn: this.state.page < Math.ceil( data.totalHits / this.state.perPage )
                 }
 
             } )
@@ -51,6 +61,7 @@ export class App extends Component {
     }
 
     componentDidUpdate( prevProps, prevState, snapshot ) {
+        console.log( prevState.value, this.state.value )
         if ( prevState.value !== this.state.value || prevState.page !== this.state.page ) {
             this.getImages();
         }
@@ -71,7 +82,7 @@ export class App extends Component {
             >
                 <Searchbar onSubmit={ this.getInputValue } />
                 <ImageGallery listItems={ this.state.imagesList } />
-                { this.state.value && <Button onClick={ this.loadMore } /> }
+                { this.state.showBtn && <Button onClick={ this.loadMore } /> }
                 { this.state.isLoading && <Loader /> }
             </div>
         );
